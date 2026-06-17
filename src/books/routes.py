@@ -2,8 +2,7 @@
 from fastapi import status, APIRouter, Depends
 from fastapi.exceptions import HTTPException
 from typing import List
-from src.books.schemas import Book, BookUpdate
-from src.books.book_data import books
+from src.books.schemas import Book, BookUpdate, CreateBook
 from src.db.main import get_session
 from sqlmodel.ext.asyncio.session import AsyncSession
 from src.books.service import BookService
@@ -15,7 +14,7 @@ book_service =   BookService()
 
 @book_router.get("/", response_model=List[Book])
 async def get_books(session:AsyncSession=Depends(get_session)):
-    books = book_service.get_all_books(session)
+    books = await book_service.get_all_books(session)
     return books
 
 @book_router.get("/{book_uid}", response_model=Book)
@@ -27,7 +26,7 @@ async def get_book(book_uid: int, session:AsyncSession=Depends(get_session)):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Book not found")
 
 @book_router.post("/", status_code=status.HTTP_201_CREATED, response_model=Book)
-async def create_book(book_data: Book, session:AsyncSession=Depends(get_session)):
+async def create_book(book_data: CreateBook, session:AsyncSession=Depends(get_session)):
     new_book = await book_service.create_book(book_data, session)
     return new_book
 
