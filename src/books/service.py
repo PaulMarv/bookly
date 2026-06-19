@@ -38,7 +38,7 @@ class BookService:
         result = await session.exec(statement)
         book = result.first()
         if not book:
-            return None
+            return {}
         await session.delete(book)
         await session.commit()
         return book
